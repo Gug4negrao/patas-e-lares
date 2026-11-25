@@ -1,0 +1,182 @@
+:root {
+  --cor-principal: #c2571a;
+  --cor-principal-escura: #9a4312;
+  --cor-texto: #2b2622;
+  --cor-suave: #6f6660;
+  --cor-fundo: #faf6f1;
+  --cor-borda: #e2d9cf;
+  --cor-erro: #b42318;
+  --cor-ok: #237a3b;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: var(--cor-principal);
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.marca {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.topo nav {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.topo nav a {
+  color: var(--cor-texto);
+  text-decoration: none;
+}
+
+.topo nav a.active {
+  color: var(--cor-principal);
+  font-weight: 600;
+}
+
+.conteudo {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.cartao {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 1.75rem;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+}
+
+.cartao h1 {
+  margin-top: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-weight: 500;
+}
+
+input {
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+}
+
+input:focus {
+  outline: 2px solid var(--cor-principal);
+  border-color: transparent;
+}
+
+fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+}
+
+label.opcao {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 400;
+}
+
+.opcional,
+.detalhe {
+  color: var(--cor-suave);
+  font-weight: 400;
+}
+
+button {
+  padding: 0.7rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: var(--cor-principal);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--cor-principal-escura);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+button.link {
+  padding: 0;
+  color: var(--cor-texto);
+  font-weight: 400;
+  background: none;
+}
+
+button.link:hover {
+  color: var(--cor-principal);
+  background: none;
+}
+
+button.perigo {
+  color: var(--cor-erro);
+  background: none;
+  border: 1px solid var(--cor-erro);
+}
+
+button.perigo:hover {
+  color: #fff;
+  background: var(--cor-erro);
+}
+
+.erro {
+  margin: 0;
+  color: var(--cor-erro);
+}
+
+.aviso {
+  margin: 0;
+  color: var(--cor-ok);
+}
+
+hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid var(--cor-borda);
+}
