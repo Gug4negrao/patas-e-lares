@@ -20,6 +20,7 @@ import Data.Time (Day, UTCTime, getCurrentTime, utctDay)
 import Database.Persist
 import GHC.Generics (Generic)
 import Network.HTTP.Types.Status
+import Text.Read (readMaybe)
 import Yesod.Core
 import Yesod.Persist.Core (runDB)
 
@@ -49,10 +50,49 @@ newtype NovoStatus = NovoStatus
 instance FromJSON DadosAnimal
 instance FromJSON NovoStatus
 
+-- Listagem com filtros opcionais na query string:
+-- especie, raca, instituicao (ids), sexo, porte, status, castrado (true/false),
+-- cidade, uf (da instituição) e busca (trecho do nome).
 getAnimaisR :: Handler Value
 getAnimaisR = do
-    animais <- runDB $ selectList [] [Desc AnimalCriadoEm]
-    toJSON <$> animaisJson animais
+    fEspecie     <- paramChave "especie"
+    fRaca        <- paramChave "raca"
+    fInstituicao <- paramChave "instituicao"
+    fSexo        <- paramValor "sexo"
+    fPorte       <- paramValor "porte"
+    fStatus      <- paramValor "status"
+    fCastrado    <- paramCastrado
+    fCidade      <- paramTexto "cidade"
+    fUf          <- paramTexto "uf"
+    fBusca       <- paramTexto "busca"
+
+    filtroLocal <- case (fCidade, fUf) of
+        (Nothing, Nothing) -> return []
+        _ -> do
+            instituicoes <- runDB $ selectList [] []
+            let confere campo filtro = maybe True (igual campo) filtro
+                ids = [ chave
+                      | Entity chave inst <- instituicoes
+                      , confere (instituicaoCidade inst) fCidade
+                      , confere (instituicaoUf inst) fUf
+                      ]
+            return [AnimalInstituicaoId <-. ids]
+
+    let filtros = concat
+            [ [AnimalEspecieId ==. e        | Just e <- [fEspecie]]
+            , [AnimalRacaId ==. Just r      | Just r <- [fRaca]]
+            , [AnimalInstituicaoId ==. i    | Just i <- [fInstituicao]]
+            , [AnimalSexo ==. s             | Just s <- [fSexo]]
+            , [AnimalPorte ==. p            | Just p <- [fPorte]]
+            , [AnimalStatus ==. s           | Just s <- [fStatus]]
+            , [AnimalCastrado ==. c         | Just c <- [fCastrado]]
+            , filtroLocal
+            ]
+    animais <- runDB $ selectList filtros [Desc AnimalCriadoEm]
+    let encontrados = case fBusca of
+            Nothing    -> animais
+            Just busca -> filter (contem busca . animalNome . entityVal) animais
+    toJSON <$> animaisJson encontrados
 
 postAnimaisR :: Handler Value
 postAnimaisR = do
@@ -214,3 +254,40 @@ animalJson especies racas instituicoes (Entity animalId animal) = object
             , "cidade" .= instituicaoCidade inst
             , "uf"     .= instituicaoUf inst
             ]
+
+-- Leitura dos filtros da query string. Valor vazio conta como "sem filtro";
+-- valor inválido responde 400.
+paramTexto :: Text -> Handler (Maybe Text)
+paramTexto nomeParam = textoOpcional <$> lookupGetParam nomeParam
+
+paramChave :: PathPiece chave => Text -> Handler (Maybe chave)
+paramChave nomeParam = do
+    valor <- paramTexto nomeParam
+    case valor of
+        Nothing -> return Nothing
+        Just t  -> maybe (paramInvalido nomeParam) (return . Just) (fromPathPiece t)
+
+paramValor :: Read valor => Text -> Handler (Maybe valor)
+paramValor nomeParam = do
+    valor <- paramTexto nomeParam
+    case valor of
+        Nothing -> return Nothing
+        Just t  -> maybe (paramInvalido nomeParam) (return . Just) (readMaybe (T.unpack t))
+
+paramCastrado :: Handler (Maybe Bool)
+paramCastrado = do
+    valor <- paramTexto "castrado"
+    case T.toLower <$> valor of
+        Nothing      -> return Nothing
+        Just "true"  -> return (Just True)
+        Just "false" -> return (Just False)
+        Just _       -> paramInvalido "castrado"
+
+paramInvalido :: Text -> Handler a
+paramInvalido nomeParam = erroJson status400 ("Valor inválido no filtro '" <> nomeParam <> "'.")
+
+igual :: Text -> Text -> Bool
+igual a b = T.toCaseFold (T.strip a) == T.toCaseFold (T.strip b)
+
+contem :: Text -> Text -> Bool
+contem trecho texto = T.toCaseFold trecho `T.isInfixOf` T.toCaseFold texto

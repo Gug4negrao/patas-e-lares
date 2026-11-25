@@ -11,6 +11,7 @@ import Yesod.Core
 import Config
 import Foundation
 import Handler.Animal
+import Handler.Especie
 import Handler.Status
 import Handler.Usuario
 

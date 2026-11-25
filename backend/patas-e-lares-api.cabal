@@ -25,6 +25,7 @@ library
         Foundation
         Handler.Animal
         Handler.Comum
+        Handler.Especie
         Handler.Status
         Handler.Usuario
         Models

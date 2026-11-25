@@ -4,6 +4,9 @@
 /api/usuarios/#UsuarioId UsuarioR GET PUT DELETE
 /api/login LoginR POST
 
+/api/especies EspeciesR GET POST
+/api/especies/#EspecieId EspecieR GET PUT DELETE
+
 /api/animais AnimaisR GET POST
 /api/animais/#AnimalId AnimalR GET PUT DELETE
 /api/animais/#AnimalId/status AnimalStatusR PATCH

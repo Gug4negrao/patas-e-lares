@@ -121,7 +121,12 @@ Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou
 | PUT | `/api/usuarios/{id}` | Atualiza nome, e-mail, telefone e, opcionalmente, a senha |
 | DELETE | `/api/usuarios/{id}` | Exclui o usuário (`409` se ele administra uma instituição ou tem solicitações) |
 | POST | `/api/login` | Confere e-mail e senha e devolve o usuário (`401` se não conferir) |
-| GET | `/api/animais` | Lista os animais, do mais recente ao mais antigo |
+| GET | `/api/especies` | Lista as espécies |
+| POST | `/api/especies` | Cadastra uma espécie (`409` se o nome já existe) |
+| GET | `/api/especies/{id}` | Consulta uma espécie |
+| PUT | `/api/especies/{id}` | Renomeia a espécie |
+| DELETE | `/api/especies/{id}` | Exclui a espécie (`409` se tem raças ou animais) |
+| GET | `/api/animais` | Lista os animais, com filtros opcionais (veja abaixo) |
 | POST | `/api/animais` | Cadastra um animal (entra como `Disponivel`) |
 | GET | `/api/animais/{id}` | Consulta um animal |
 | PUT | `/api/animais/{id}` | Atualiza os dados do animal (instituição e status não mudam por aqui) |
@@ -160,6 +165,8 @@ Exemplo de cadastro (`POST /api/animais`); no `PUT` o corpo é o mesmo, sem `ins
   "...": "demais campos do cadastro e criadoEm"
 }
 ```
+
+Filtros de `GET /api/animais` (todos opcionais e combináveis): `especie`, `raca` e `instituicao` (ids), `sexo`, `porte`, `status`, `castrado` (`true`/`false`), `cidade` e `uf` (da instituição) e `busca` (trecho do nome). Exemplo: `/api/animais?especie=2&porte=Pequeno&status=Disponivel&uf=SP`.
 
 O status `EmProcesso` e `Adotado` é definido pelo fluxo de solicitação e adoção; pelo `PATCH` de status o gestor só alterna entre `Disponivel` e `Inativo`. Para reaproveitar o formato de animal em outras respostas, use `animaisJson` de `Handler.Animal`.
 
