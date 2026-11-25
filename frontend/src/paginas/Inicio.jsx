@@ -11,6 +11,7 @@ export default function Inicio() {
         No Patas & Lares, abrigos e ONGs divulgam animais para adoção e
         adotantes encontram um novo companheiro.
       </p>
+      <p><Link className="botao" to="/animais">Ver animais para adoção</Link></p>
       {usuario ? (
         <p>Olá, {usuario.nome}! <Link to="/perfil">Ver meu perfil</Link></p>
       ) : (

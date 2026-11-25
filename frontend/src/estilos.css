@@ -180,3 +180,310 @@ hr {
   border: none;
   border-top: 1px solid var(--cor-borda);
 }
+
+/* Animais e saúde */
+
+select,
+textarea {
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--cor-principal);
+  border-color: transparent;
+}
+
+a.botao {
+  display: inline-block;
+  padding: 0.7rem 1rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: var(--cor-principal);
+  border-radius: 8px;
+}
+
+a.botao:hover {
+  background: var(--cor-principal-escura);
+}
+
+button.secundario {
+  color: var(--cor-principal);
+  background: #fff;
+  border: 1px solid var(--cor-principal);
+}
+
+button.secundario:hover:not(:disabled) {
+  color: #fff;
+}
+
+button.link.perigo-texto {
+  color: var(--cor-erro);
+}
+
+.cartao.largo {
+  max-width: 640px;
+}
+
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.filtros input {
+  flex: 1 1 160px;
+}
+
+.filtros input.curto {
+  flex: none;
+  width: 4.5rem;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.ficha {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--cor-texto);
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+}
+
+.ficha:hover {
+  border-color: var(--cor-principal);
+}
+
+.ficha img,
+.ficha .sem-foto {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+.sem-foto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cor-suave);
+  background: #f1e8de;
+}
+
+.sem-foto.grande {
+  height: 260px;
+  border-radius: 12px;
+}
+
+.ficha-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.8rem 0.9rem 1rem;
+  font-size: 0.93rem;
+}
+
+.ficha-texto strong {
+  font-size: 1.05rem;
+}
+
+.selo {
+  align-self: flex-start;
+  margin-top: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #eee;
+}
+
+.selo-Disponivel { color: var(--cor-ok); background: #e3f3e7; }
+.selo-EmProcesso { color: #8a5a00; background: #fdf0d5; }
+.selo-Adotado { color: #3c4fa8; background: #e5e9fb; }
+.selo-Inativo { color: var(--cor-suave); background: #ece8e4; }
+
+.perfil-animal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.75rem;
+}
+
+.perfil-animal img {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.perfil-animal h1 {
+  margin: 0 0 0.3rem;
+}
+
+.perfil-animal dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.45rem 1rem;
+  margin: 1.2rem 0 0;
+}
+
+.perfil-animal dt {
+  font-weight: 600;
+}
+
+.perfil-animal dd {
+  margin: 0;
+}
+
+.descricao {
+  margin: 1.5rem 0;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.acoes-linha {
+  display: flex;
+  gap: 0.8rem;
+  white-space: nowrap;
+}
+
+.saude {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+}
+
+.saude h2 {
+  margin: 0;
+}
+
+.saude table {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+}
+
+.saude th,
+.saude td {
+  padding: 0.55rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.saude tr.em-edicao {
+  background: #fbf1e8;
+}
+
+.form-saude {
+  margin-top: 1.5rem;
+}
+
+.form-saude h3 {
+  margin: 0;
+}
+
+.linha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.lista-simples {
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-simples li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.form-linha {
+  flex-direction: row;
+}
+
+.form-linha input {
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .perfil-animal,
+  .linha {
+    grid-template-columns: 1fr;
+  }
+
+  .saude {
+    overflow-x: auto;
+  }
+}
+
+.sobre-raca {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+}
+
+.sobre-raca img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.sobre-raca h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.sobre-raca p {
+  margin: 0.3rem 0;
+}
+
+@media (max-width: 640px) {
+  .sobre-raca {
+    flex-direction: column;
+  }
+}

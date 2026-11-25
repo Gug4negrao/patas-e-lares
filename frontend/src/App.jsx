@@ -5,6 +5,10 @@ import Inicio from './paginas/Inicio.jsx'
 import Cadastro from './paginas/Cadastro.jsx'
 import Login from './paginas/Login.jsx'
 import Perfil from './paginas/Perfil.jsx'
+import Animais from './paginas/Animais.jsx'
+import Animal from './paginas/Animal.jsx'
+import AnimalForm from './paginas/AnimalForm.jsx'
+import Especies from './paginas/Especies.jsx'
 
 export default function App() {
   const { usuario, sair } = useSessao()
@@ -23,8 +27,10 @@ export default function App() {
         <Link to="/" className="marca">Patas & Lares</Link>
         <nav>
           <NavLink to="/" end>Início</NavLink>
+          <NavLink to="/animais" end>Adotar</NavLink>
           {usuario ? (
             <>
+              {usuario.tipo === 'Gestor' && <NavLink to="/meus-animais">Meus animais</NavLink>}
               <NavLink to="/perfil">Meu perfil</NavLink>
               <button className="link" onClick={encerrarSessao}>Sair</button>
             </>
@@ -43,6 +49,12 @@ export default function App() {
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/login" element={<Login />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/animais" element={<Animais />} />
+          <Route path="/animais/novo" element={<AnimalForm />} />
+          <Route path="/animais/:id" element={<Animal />} />
+          <Route path="/animais/:id/editar" element={<AnimalForm />} />
+          <Route path="/meus-animais" element={<Animais gestao />} />
+          <Route path="/especies" element={<Especies />} />
           <Route path="*" element={<p>Página não encontrada.</p>} />
         </Routes>
       </main>
