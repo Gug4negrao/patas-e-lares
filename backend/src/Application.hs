@@ -10,6 +10,7 @@ import Yesod.Core
 
 import Config
 import Foundation
+import Handler.Animal
 import Handler.Status
 import Handler.Usuario
 

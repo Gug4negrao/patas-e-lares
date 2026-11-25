@@ -121,6 +121,12 @@ Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou
 | PUT | `/api/usuarios/{id}` | Atualiza nome, e-mail, telefone e, opcionalmente, a senha |
 | DELETE | `/api/usuarios/{id}` | Exclui o usuário (`409` se ele administra uma instituição ou tem solicitações) |
 | POST | `/api/login` | Confere e-mail e senha e devolve o usuário (`401` se não conferir) |
+| GET | `/api/animais` | Lista os animais, do mais recente ao mais antigo |
+| POST | `/api/animais` | Cadastra um animal (entra como `Disponivel`) |
+| GET | `/api/animais/{id}` | Consulta um animal |
+| PUT | `/api/animais/{id}` | Atualiza os dados do animal (instituição e status não mudam por aqui) |
+| PATCH | `/api/animais/{id}/status` | Pausa ou volta a anunciar: aceita `Disponivel` ou `Inativo` |
+| DELETE | `/api/animais/{id}` | Exclui o animal e seu histórico de saúde (`409` se tem solicitações ou adoção) |
 
 Exemplo de cadastro (`POST /api/usuarios`):
 
@@ -129,6 +135,33 @@ Exemplo de cadastro (`POST /api/usuarios`):
 ```
 
 `tipo` aceita `Adotante` ou `Gestor`. `telefone` é opcional. A senha precisa ter pelo menos 6 caracteres e é guardada com hash bcrypt. No `PUT`, a `senha` só é trocada se for enviada; o `tipo` não muda.
+
+### Animais
+
+Exemplo de cadastro (`POST /api/animais`); no `PUT` o corpo é o mesmo, sem `instituicaoId`:
+
+```json
+{
+  "instituicaoId": 1, "especieId": 1, "racaId": null,
+  "nome": "Bolinha", "sexo": "Femea", "porte": "Pequeno",
+  "nascimentoAprox": "2023-05-10", "descricao": "Carinhosa e brincalhona.",
+  "fotoUrl": "https://exemplo.com/bolinha.jpg", "castrado": false
+}
+```
+
+`sexo`: `Macho` ou `Femea`. `porte`: `Pequeno`, `Medio` ou `Grande`. `racaId`, `nascimentoAprox` e `fotoUrl` são opcionais; a raça precisa ser da espécie informada e a data não pode estar no futuro. A resposta já traz espécie, raça (com temperamento, expectativa de vida e imagem) e instituição:
+
+```json
+{
+  "id": 1, "nome": "Bolinha", "sexo": "Femea", "porte": "Pequeno", "status": "Disponivel",
+  "especie": { "id": 1, "nome": "Cão" },
+  "raca": null,
+  "instituicao": { "id": 1, "nome": "Abrigo Patinhas", "cidade": "Santos", "uf": "SP" },
+  "...": "demais campos do cadastro e criadoEm"
+}
+```
+
+O status `EmProcesso` e `Adotado` é definido pelo fluxo de solicitação e adoção; pelo `PATCH` de status o gestor só alterna entre `Disponivel` e `Inativo`. Para reaproveitar o formato de animal em outras respostas, use `animaisJson` de `Handler.Animal`.
 
 ## Integrantes
 

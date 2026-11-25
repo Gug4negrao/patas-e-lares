@@ -3,3 +3,7 @@
 /api/usuarios UsuariosR GET POST
 /api/usuarios/#UsuarioId UsuarioR GET PUT DELETE
 /api/login LoginR POST
+
+/api/animais AnimaisR GET POST
+/api/animais/#AnimalId AnimalR GET PUT DELETE
+/api/animais/#AnimalId/status AnimalStatusR PATCH

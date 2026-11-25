@@ -23,6 +23,7 @@ library
         Banco
         Config
         Foundation
+        Handler.Animal
         Handler.Comum
         Handler.Status
         Handler.Usuario
@@ -34,6 +35,7 @@ library
         aeson,
         bcrypt,
         bytestring,
+        containers,
         http-types,
         monad-logger,
         persistent,
