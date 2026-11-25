@@ -132,6 +132,11 @@ Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou
 | PUT | `/api/animais/{id}` | Atualiza os dados do animal (instituição e status não mudam por aqui) |
 | PATCH | `/api/animais/{id}/status` | Pausa ou volta a anunciar: aceita `Disponivel` ou `Inativo` |
 | DELETE | `/api/animais/{id}` | Exclui o animal e seu histórico de saúde (`409` se tem solicitações ou adoção) |
+| GET | `/api/animais/{id}/saude` | Histórico de saúde do animal, do mais recente ao mais antigo (filtro opcional `?tipo=`) |
+| POST | `/api/animais/{id}/saude` | Inclui um registro de saúde |
+| GET | `/api/saude/{id}` | Consulta um registro de saúde |
+| PUT | `/api/saude/{id}` | Atualiza um registro de saúde |
+| DELETE | `/api/saude/{id}` | Remove um registro de saúde |
 
 Exemplo de cadastro (`POST /api/usuarios`):
 
@@ -169,6 +174,16 @@ Exemplo de cadastro (`POST /api/animais`); no `PUT` o corpo é o mesmo, sem `ins
 Filtros de `GET /api/animais` (todos opcionais e combináveis): `especie`, `raca` e `instituicao` (ids), `sexo`, `porte`, `status`, `castrado` (`true`/`false`), `cidade` e `uf` (da instituição) e `busca` (trecho do nome). Exemplo: `/api/animais?especie=2&porte=Pequeno&status=Disponivel&uf=SP`.
 
 O status `EmProcesso` e `Adotado` é definido pelo fluxo de solicitação e adoção; pelo `PATCH` de status o gestor só alterna entre `Disponivel` e `Inativo`. Para reaproveitar o formato de animal em outras respostas, use `animaisJson` de `Handler.Animal`.
+
+### Registros de saúde
+
+Exemplo (`POST /api/animais/1/saude`):
+
+```json
+{ "tipo": "Vacina", "descricao": "V10", "realizadoEm": "2026-10-01", "veterinario": "Dra. Ana" }
+```
+
+`tipo`: `Vacina`, `Vermifugo`, `Consulta` ou `Castracao`. `veterinario` é opcional. Registrar uma `Castracao` já marca o animal como castrado.
 
 ## Integrantes
 

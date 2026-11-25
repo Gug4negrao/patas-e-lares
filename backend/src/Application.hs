@@ -12,6 +12,7 @@ import Config
 import Foundation
 import Handler.Animal
 import Handler.Especie
+import Handler.RegistroSaude
 import Handler.Status
 import Handler.Usuario
 

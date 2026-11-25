@@ -10,3 +10,6 @@
 /api/animais AnimaisR GET POST
 /api/animais/#AnimalId AnimalR GET PUT DELETE
 /api/animais/#AnimalId/status AnimalStatusR PATCH
+
+/api/animais/#AnimalId/saude RegistrosSaudeR GET POST
+/api/saude/#RegistroSaudeId RegistroSaudeR GET PUT DELETE
