@@ -1,1 +1,5 @@
 /api/status StatusR GET
+
+/api/usuarios UsuariosR GET POST
+/api/usuarios/#UsuarioId UsuarioR GET PUT DELETE
+/api/login LoginR POST

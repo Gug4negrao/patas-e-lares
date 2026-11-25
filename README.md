@@ -115,6 +115,20 @@ Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou
 | Método | Rota | Finalidade |
 | --- | --- | --- |
 | GET | `/api/status` | Verifica se a API e o banco estão no ar |
+| GET | `/api/usuarios` | Lista os usuários (sem a senha) |
+| POST | `/api/usuarios` | Cadastra um usuário |
+| GET | `/api/usuarios/{id}` | Consulta um usuário |
+| PUT | `/api/usuarios/{id}` | Atualiza nome, e-mail, telefone e, opcionalmente, a senha |
+| DELETE | `/api/usuarios/{id}` | Exclui o usuário (`409` se ele administra uma instituição ou tem solicitações) |
+| POST | `/api/login` | Confere e-mail e senha e devolve o usuário (`401` se não conferir) |
+
+Exemplo de cadastro (`POST /api/usuarios`):
+
+```json
+{ "nome": "Ana Souza", "email": "ana@email.com", "senha": "segredo1", "telefone": "11 99999-0000", "tipo": "Adotante" }
+```
+
+`tipo` aceita `Adotante` ou `Gestor`. `telefone` é opcional. A senha precisa ter pelo menos 6 caracteres e é guardada com hash bcrypt. No `PUT`, a `senha` só é trocada se for enviada; o `tipo` não muda.
 
 ## Integrantes
 

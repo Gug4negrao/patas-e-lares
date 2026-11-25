@@ -23,12 +23,16 @@ library
         Banco
         Config
         Foundation
+        Handler.Comum
         Handler.Status
+        Handler.Usuario
         Models
+        Senha
         Tipos
     build-depends:
         base >=4.18 && <5,
         aeson,
+        bcrypt,
         bytestring,
         http-types,
         monad-logger,

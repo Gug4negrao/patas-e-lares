@@ -8,6 +8,7 @@ import Yesod.Core
 import Yesod.Persist.Core
 
 import Config (Config)
+import Models
 
 data App = App
     { appPool   :: ConnectionPool
