@@ -1,0 +1,14 @@
+services:
+  banco:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: patas
+      POSTGRES_PASSWORD: patas
+      POSTGRES_DB: patas_e_lares
+    ports:
+      - "5432:5432"
+    volumes:
+      - dados-banco:/var/lib/postgresql/data
+
+volumes:
+  dados-banco:

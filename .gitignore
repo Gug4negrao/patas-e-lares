@@ -1,0 +1,17 @@
+dist-newstyle/
+*.hi
+*.o
+
+node_modules/
+frontend/dist/
+
+.env
+.env.local
+
+.pgdata/
+*.log
+
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

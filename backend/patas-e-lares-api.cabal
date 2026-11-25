@@ -1,0 +1,52 @@
+cabal-version:      3.0
+name:               patas-e-lares-api
+version:            0.1.0.0
+synopsis:           API REST do Patas & Lares (adoção de animais) em Yesod
+build-type:         Simple
+extra-source-files: config/routes.yesodroutes
+
+common comum
+    default-language:   GHC2021
+    default-extensions:
+        OverloadedStrings
+        TemplateHaskell
+        QuasiQuotes
+        TypeFamilies
+        ViewPatterns
+    ghc-options:        -Wall
+
+library
+    import:           comum
+    hs-source-dirs:   src
+    exposed-modules:
+        Application
+        Config
+        Foundation
+        Handler.Status
+    build-depends:
+        base >=4.18 && <5,
+        aeson,
+        bytestring,
+        http-types,
+        monad-logger,
+        persistent,
+        persistent-postgresql,
+        text,
+        wai,
+        wai-cors,
+        wai-extra,
+        warp,
+        yesod-core,
+        yesod-persistent
+
+executable patas-e-lares-api
+    import:           comum
+    hs-source-dirs:   app
+    main-is:          Main.hs
+    ghc-options:      -threaded -rtsopts
+    build-depends:
+        base,
+        monad-logger,
+        patas-e-lares-api,
+        persistent-postgresql,
+        warp
