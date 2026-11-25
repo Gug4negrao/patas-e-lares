@@ -75,6 +75,9 @@ backend/
   src/Config.hs                variáveis de ambiente
   src/Foundation.hs            tipo App, instância Yesod, runDB, erros em JSON
   src/Application.hs           liga rotas aos handlers, CORS e log
+  src/Models.hs                as 9 entidades do banco (Persistent)
+  src/Tipos.hs                 tipos de valor fixo: status, porte, sexo...
+  src/Banco.hs                 migração automática e dados iniciais
   src/Handler/*.hs             um módulo por entidade
 ```
 
@@ -82,7 +85,21 @@ Para criar um endpoint: adicione a rota em `config/routes.yesodroutes`, crie a f
 
 ## Estrutura do banco de dados
 
-_A ser preenchido no commit das entidades._
+As tabelas são criadas pela migração do Persistent ao subir a API, que também cadastra as espécies Cão e Gato. Todas têm `id` como chave primária.
+
+| Tabela | Descrição | Relacionamentos |
+| --- | --- | --- |
+| `usuario` | Pessoas que usam o sistema. `tipo`: `Adotante` ou `Gestor` (quem administra uma instituição) | e-mail único |
+| `instituicao` | ONGs e abrigos, com endereço completo | `usuario_id` → usuario (1 para 1) |
+| `especie` | Cão, gato etc. | nome único |
+| `raca` | Raças de cada espécie; as de cães vêm da TheDogAPI | `especie_id` → especie |
+| `animal` | Animais anunciados. `status`: `Disponivel`, `EmProcesso`, `Adotado`, `Inativo` | `instituicao_id`, `especie_id`, `raca_id` (opcional) |
+| `registro_saude` | Vacinas, vermífugos, consultas e castração do animal | `animal_id` → animal (apaga junto com o animal) |
+| `solicitacao_adocao` | Pedido de adoção. `status`: `Pendente`, `Aprovada`, `Rejeitada`, `Cancelada` | `usuario_id`, `animal_id` |
+| `adocao` | Adoção efetivada: data, termo, acompanhamento | `solicitacao_id` e `animal_id` únicos (um animal só é adotado uma vez) |
+| `favorito` | Animais favoritados por um usuário | `usuario_id` + `animal_id` únicos; apaga junto com o usuário ou o animal |
+
+Instituição, espécie, raça e animal com registros dependentes não podem ser excluídos (`ON DELETE RESTRICT`); a API responde `409`.
 
 ## Integração com APIs externas
 

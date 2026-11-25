@@ -20,9 +20,12 @@ library
     hs-source-dirs:   src
     exposed-modules:
         Application
+        Banco
         Config
         Foundation
         Handler.Status
+        Models
+        Tipos
     build-depends:
         base >=4.18 && <5,
         aeson,
@@ -32,6 +35,7 @@ library
         persistent,
         persistent-postgresql,
         text,
+        time,
         wai,
         wai-cors,
         wai-extra,
