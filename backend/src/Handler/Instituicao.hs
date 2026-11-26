@@ -4,6 +4,8 @@ module Handler.Instituicao
     ( getInstituicoesR
     , postInstituicoesR
     , getInstituicaoR
+    , putInstituicaoR
+    , deleteInstituicaoR
     , instituicaoJson
     ) where
 
@@ -116,3 +118,56 @@ postInstituicoesR = do
     instituicaoId <- runDB $ insert instituicao
 
     sendStatusJSON status201 (instituicaoJson (Entity instituicaoId instituicao))
+
+putInstituicaoR :: InstituicaoId -> Handler Value
+putInstituicaoR instituicaoId = do
+    atual <- encontrarOu404 "Instituição não encontrada." instituicaoId
+    dados <- lerJson :: Handler DadosInstituicao
+
+    let nomeLimpo  = T.strip dados.nome
+        emailLimpo = T.toLower (T.strip dados.email)
+        cepLimpo   = T.filter (/= '-') (T.strip dados.cep)
+        ufLimpa    = T.toUpper (T.strip dados.uf)
+
+    validarInstituicao dados nomeLimpo emailLimpo cepLimpo ufLimpa
+
+    usuario <- encontrarOu404 "Gestor não encontrado." dados.usuarioId
+
+    exigir (usuarioTipo usuario == Gestor) "A instituição deve estar associada a um usuário do tipo Gestor."
+
+    existente <- runDB $ getBy (UniqueInstituicaoUsuario dados.usuarioId)
+
+    when (maybe False (const True) existente && instituicaoUsuarioId atual /= dados.usuarioId)
+        (erroJson status409 "Este gestor já possui uma instituição cadastrada.")
+
+    let instituicao = atual
+            { instituicaoUsuarioId   = dados.usuarioId
+            , instituicaoNome        = nomeLimpo
+            , instituicaoCnpj        = textoOpcional dados.cnpj
+            , instituicaoTelefone    = T.strip dados.telefone
+            , instituicaoEmail       = emailLimpo
+            , instituicaoCep         = cepLimpo
+            , instituicaoLogradouro  = T.strip dados.logradouro
+            , instituicaoNumero      = T.strip dados.numero
+            , instituicaoComplemento = textoOpcional dados.complemento
+            , instituicaoBairro      = T.strip dados.bairro
+            , instituicaoCidade      = T.strip dados.cidade
+            , instituicaoUf          = ufLimpa
+            }
+
+    runDB $ replace instituicaoId instituicao
+
+    return $ instituicaoJson (Entity instituicaoId instituicao)
+
+deleteInstituicaoR :: InstituicaoId -> Handler ()
+deleteInstituicaoR instituicaoId = do
+    _ <- encontrarOu404 "Instituição não encontrada." instituicaoId
+
+    animais <- runDB $ selectList [AnimalInstituicaoId ==. instituicaoId] []
+
+    when (not (null animais))
+        (erroJson status409 "Não é possível excluir uma instituição que possui animais cadastrados.")
+
+    runDB $ delete instituicaoId
+
+    sendResponseStatus status204 ()

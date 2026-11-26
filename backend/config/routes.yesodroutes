@@ -15,4 +15,4 @@
 /api/saude/#RegistroSaudeId RegistroSaudeR GET PUT DELETE
 
 /api/instituicoes InstituicoesR GET POST
-/api/instituicoes/#InstituicaoId InstituicaoR GET 
+/api/instituicoes/#InstituicaoId InstituicaoR GET PUT DELETE
