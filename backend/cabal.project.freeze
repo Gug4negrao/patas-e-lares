@@ -242,5 +242,5 @@ constraints: any.Cabal ==3.12.1.0,
              any.yesod-core ==1.7.0.0,
              any.yesod-persistent ==1.6.0.9,
              any.zlib ==0.7.1.1,
-             zlib -bundled-c-zlib +non-blocking-ffi +pkg-config
+             zlib +bundled-c-zlib +non-blocking-ffi -pkg-config
 index-state: hackage.haskell.org 2026-11-24T21:41:50Z

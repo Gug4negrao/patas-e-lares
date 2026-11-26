@@ -16,3 +16,4 @@
 
 /api/instituicoes InstituicoesR GET POST
 /api/instituicoes/#InstituicaoId InstituicaoR GET PUT DELETE
+/api/cep/#Text CepR GET
