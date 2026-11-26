@@ -4,6 +4,7 @@ import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Logger (runStdoutLoggingT)
 import Database.Persist.Postgresql (withPostgresqlPool)
 import Network.Wai.Handler.Warp (run)
+import System.IO (BufferMode (..), hSetBuffering, stderr, stdout)
 
 import Application (criarAplicacao)
 import Banco (prepararBanco)
@@ -12,6 +13,8 @@ import Foundation (App (..))
 
 main :: IO ()
 main = do
+    hSetBuffering stdout LineBuffering
+    hSetBuffering stderr LineBuffering
     config <- carregarConfig
     runStdoutLoggingT $
         withPostgresqlPool (cfgBanco config) (cfgTamanhoPool config) $ \pool -> liftIO $ do
