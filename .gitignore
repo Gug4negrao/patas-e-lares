@@ -1,3 +1,4 @@
+
 dist-newstyle/
 *.hi
 *.o
@@ -7,6 +8,8 @@ frontend/dist/
 
 .env
 .env.local
+.env.*
+!.env.example
 
 .pgdata/
 *.log
@@ -15,3 +18,5 @@ frontend/dist/
 .idea/
 Thumbs.db
 .DS_Store
+
+coverage/

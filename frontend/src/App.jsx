@@ -9,6 +9,7 @@ import Animais from './paginas/Animais.jsx'
 import Animal from './paginas/Animal.jsx'
 import AnimalForm from './paginas/AnimalForm.jsx'
 import Especies from './paginas/Especies.jsx'
+import Instituicoes from './paginas/Instituicoes.jsx'
 
 export default function App() {
   const { usuario, sair } = useSessao()
@@ -31,6 +32,7 @@ export default function App() {
           {usuario ? (
             <>
               {usuario.tipo === 'Gestor' && <NavLink to="/meus-animais">Meus animais</NavLink>}
+              {usuario.tipo === 'Gestor' && <NavLink to="/instituicoes">Minha instituição</NavLink>}
               <NavLink to="/perfil">Meu perfil</NavLink>
               <button className="link" onClick={encerrarSessao}>Sair</button>
             </>
@@ -55,9 +57,10 @@ export default function App() {
           <Route path="/animais/:id/editar" element={<AnimalForm />} />
           <Route path="/meus-animais" element={<Animais gestao />} />
           <Route path="/especies" element={<Especies />} />
+          <Route path="/instituicoes" element={<Instituicoes />} />
           <Route path="*" element={<p>Página não encontrada.</p>} />
-        </Routes>
-      </main>
+      </Routes>
+            </main>
     </>
   )
 }
