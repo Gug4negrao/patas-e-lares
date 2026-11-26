@@ -13,3 +13,6 @@
 
 /api/animais/#AnimalId/saude RegistrosSaudeR GET POST
 /api/saude/#RegistroSaudeId RegistroSaudeR GET PUT DELETE
+
+/api/instituicoes InstituicoesR GET POST
+/api/instituicoes/#InstituicaoId InstituicaoR GET 

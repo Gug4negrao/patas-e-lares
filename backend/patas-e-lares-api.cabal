@@ -26,6 +26,7 @@ library
         Handler.Animal
         Handler.Comum
         Handler.Especie
+        Handler.Instituicao
         Handler.RegistroSaude
         Handler.Status
         Handler.Usuario

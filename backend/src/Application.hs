@@ -15,6 +15,7 @@ import Handler.Especie
 import Handler.RegistroSaude
 import Handler.Status
 import Handler.Usuario
+import Handler.Instituicao
 
 mkYesodDispatch "App" resourcesApp
 
