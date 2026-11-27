@@ -22,8 +22,25 @@ src/
   animais.js      textos de sexo/porte/status, cálculo de idade e buscas usadas nas telas de animais
   racas.js        busca sem acentos e separação dos temperamentos, usadas no catálogo de raças
   paginas/        uma tela por arquivo
-  componentes/    partes reaproveitadas dentro das telas (ex.: histórico de saúde)
+  componentes/    partes reaproveitadas: logo, rodapé, histórico de saúde
+public/
+  favicon.svg     ícone da aba (o mesmo desenho do logo)
 ```
+
+## Identidade visual
+
+O logo é uma casa (lar) com uma pegada (patas) dentro: `<Logo />` em [src/componentes/Logo.jsx](src/componentes/Logo.jsx). As cores e medidas ficam em variáveis no topo de [src/estilos.css](src/estilos.css); use as variáveis em vez de escrever cores soltas.
+
+| Variável | Cor | Uso |
+| --- | --- | --- |
+| `--cor-principal` | terracota `#b84d14` | botões, links, destaques |
+| `--cor-secundaria` | verde-lar `#1f5f5b` | logo, rodapé, etiquetas, números |
+| `--cor-mel` | mel `#f2b544` | detalhes e foco do teclado |
+| `--cor-fundo` / `--cor-creme` | creme | fundo da página e áreas suaves |
+
+Fontes (Google Fonts, carregadas no `index.html`): **Fredoka** nos títulos e **Nunito** no texto. Todas as combinações de cor de texto passam no contraste mínimo WCAG AA (4,5:1).
+
+Classes prontas para novas telas: `cartao` (formulário centralizado; `cartao largo` para mais espaço), `cabecalho` (título + ações), `filtros`, `grade` + `ficha` (cards com foto), `selo selo-<Status>`, `botao` (link com cara de botão; `botao-secundario` para o contorno), `secundario` e `perigo` (botões), `erro` e `aviso` (mensagens), `detalhe` (texto de apoio). Abaixo de 920px o menu vira o botão "Menu"; abaixo de 640px as grades e fichas ficam em uma coluna.
 
 Para criar uma tela: adicione o arquivo em `src/paginas/`, registre a rota em `App.jsx` e use `api()` para falar com o backend. Erros da API chegam como exceção com a mensagem do campo `erro`.
 
