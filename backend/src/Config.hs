@@ -16,6 +16,7 @@ data Config = Config
     , cfgBanco          :: ByteString
     , cfgTamanhoPool    :: Int
     , cfgOrigemFrontend :: Text
+    , cfgChaveDogApi    :: Maybe Text
     }
 
 carregarConfig :: IO Config
@@ -25,11 +26,13 @@ carregarConfig = do
                   "host=localhost port=5432 user=patas password=patas dbname=patas_e_lares"
     pool   <- lerNumero "DB_POOL" 10
     origem <- lerTexto "FRONTEND_ORIGIN" "http://localhost:5173"
+    chave  <- lerOpcional "THEDOGAPI_KEY"
     return Config
         { cfgPorta          = porta
         , cfgBanco          = TE.encodeUtf8 banco
         , cfgTamanhoPool    = pool
         , cfgOrigemFrontend = origem
+        , cfgChaveDogApi    = chave
         }
 
 lerTexto :: String -> Text -> IO Text
@@ -38,6 +41,13 @@ lerTexto nome padrao = do
     return $ case valor of
         Just v | not (null v) -> T.pack v
         _                     -> padrao
+
+lerOpcional :: String -> IO (Maybe Text)
+lerOpcional nome = do
+    valor <- lookupEnv nome
+    return $ case T.strip . T.pack <$> valor of
+        Just v | not (T.null v) -> Just v
+        _                       -> Nothing
 
 lerNumero :: String -> Int -> IO Int
 lerNumero nome padrao = do
