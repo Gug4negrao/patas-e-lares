@@ -29,6 +29,7 @@ library
         Handler.Comum
         Handler.CEP
         Handler.Especie
+        Handler.Favorito
         Handler.Filtros
         Handler.Instituicao
         Handler.Raca

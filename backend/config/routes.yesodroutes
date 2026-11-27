@@ -26,3 +26,7 @@
 /api/solicitacoes/#SolicitacaoAdocaoId                 SolicitacaoR GET DELETE
 /api/solicitacoes/#SolicitacaoAdocaoId/aprovar         AprovarSolicitacaoR PATCH
 /api/solicitacoes/#SolicitacaoAdocaoId/rejeitar        RejeitarSolicitacaoR PATCH
+/api/adocoes                                           AdocoesR GET
+/api/adocoes/#AdocaoId                                 AdocaoR GET PUT
+/api/usuarios/#UsuarioId/favoritos                     FavoritosUsuarioR GET POST
+/api/favoritos/#FavoritoId                             FavoritoR DELETE
