@@ -4,6 +4,10 @@ Sistema de adoção de animais. Instituições (ONGs e abrigos) cadastram animai
 
 Projeto final da disciplina de Haskell: backend em **Yesod** (API REST/JSON) e frontend em **React**.
 
+**Acesse:** https://patas-e-lares.onrender.com · API: https://patas-e-lares-api.onrender.com/api/status
+
+> A API está no plano gratuito do Render e "dorme" depois de 15 minutos sem acesso. O primeiro acesso depois disso pode levar até 1 minuto.
+
 ## Principais funcionalidades
 
 - Cadastro e login de usuários (adotantes e instituições)
@@ -17,9 +21,10 @@ Projeto final da disciplina de Haskell: backend em **Yesod** (API REST/JSON) e f
 | Camada | Tecnologia |
 | --- | --- |
 | Backend | Haskell (GHC 9.10), Yesod (`yesod-core`), Persistent, Warp, cabal |
-| Banco de dados | PostgreSQL 16 |
-| Frontend | React + Vite |
+| Banco de dados | PostgreSQL |
+| Frontend | React + Vite + React Router |
 | APIs externas | ViaCEP, TheDogAPI |
+| Hospedagem | Render (site estático e API em Docker), Neon (PostgreSQL), GitHub Actions (imagem Docker) |
 
 ## Como executar
 
@@ -89,6 +94,8 @@ Telas principais:
 | `/meus-animais`, `/animais/novo`, `/especies` | Gestão dos animais e espécies (gestor) |
 | `/instituicoes` | Instituição do gestor |
 | `/racas` e `/racas/{id}` | Catálogo de raças de cães (TheDogAPI), com busca, e ficha da raça com os animais dela para adoção |
+| `/minhas-solicitacoes` e `/favoritos` | Pedidos de adoção e animais favoritos do adotante |
+| `/solicitacoes` | Pedidos recebidos pela instituição, com aprovar e rejeitar (gestor) |
 
 Detalhes da organização do código em [frontend/README.md](frontend/README.md). O menu se reorganiza em telas estreitas (celular).
 
@@ -104,7 +111,10 @@ backend/
   src/Models.hs                as 9 entidades do banco (Persistent)
   src/Tipos.hs                 tipos de valor fixo: status, porte, sexo...
   src/Banco.hs                 migração automática e dados iniciais
-  src/Handler/*.hs             um módulo por entidade
+  src/DogApi.hs                comunicação com a TheDogAPI e importação das raças
+  src/Senha.hs                 hash e conferência de senha (bcrypt)
+  src/Handler/*.hs             um módulo por entidade (Comum e Filtros: funções compartilhadas)
+  Dockerfile                   imagem usada na hospedagem
 ```
 
 Para criar um endpoint: adicione a rota em `config/routes.yesodroutes`, crie a função no `src/Handler/<Entidade>.hs`, registre o módulo no `.cabal` (`exposed-modules`) e importe-o em `src/Application.hs`.
@@ -136,7 +146,7 @@ Instituição, espécie, raça e animal com registros dependentes não podem ser
 
 ## Endpoints
 
-Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou `500`; nas integrações externas, também `502` (o serviço externo falhou) ou `503` (integração não configurada no servidor).
+Erros sempre respondem `{"erro": "mensagem"}`, com status `400` (entrada inválida), `401` (login não confere), `403` (ação não permitida para o tipo de usuário), `404`, `409` (conflito com uma regra) ou `500`; nas integrações externas, também `502` (o serviço externo falhou) ou `503` (integração não configurada no servidor).
 
 | Método | Rota | Finalidade |
 | --- | --- | --- |
@@ -166,6 +176,24 @@ Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou
 | GET | `/api/racas` | Lista as raças em ordem alfabética, com filtros opcionais `?especie=` (id) e `?busca=` (trecho do nome) |
 | GET | `/api/racas/{id}` | Consulta uma raça |
 | POST | `/api/racas/sincronizar` | Importa ou atualiza as raças de cães a partir da TheDogAPI (`503` sem chave, `502` se a TheDogAPI falhar) |
+| GET | `/api/instituicoes` | Lista as instituições |
+| POST | `/api/instituicoes` | Cadastra a instituição de um gestor (`400` se o usuário não é `Gestor`, `409` se ele já tem uma) |
+| GET | `/api/instituicoes/{id}` | Consulta uma instituição |
+| PUT | `/api/instituicoes/{id}` | Atualiza os dados da instituição |
+| DELETE | `/api/instituicoes/{id}` | Exclui a instituição (`409` se tem animais cadastrados) |
+| GET | `/api/cep/{cep}` | Consulta o endereço no ViaCEP (`400` CEP inválido, `404` CEP inexistente, `502` ViaCEP fora do ar) |
+| GET | `/api/solicitacoes` | Lista as solicitações, com filtros opcionais `usuario`, `animal`, `instituicao` (ids) e `status` |
+| POST | `/api/solicitacoes` | Cria uma solicitação de adoção (`403` se não é adotante, `409` se o animal não está disponível ou já há pedido pendente do mesmo usuário) |
+| GET | `/api/solicitacoes/{id}` | Consulta uma solicitação |
+| DELETE | `/api/solicitacoes/{id}` | Cancela a solicitação, que fica no histórico como `Cancelada` (só se estiver `Pendente`) |
+| PATCH | `/api/solicitacoes/{id}/aprovar` | Aprova: registra a adoção, marca o animal como `Adotado` e rejeita os outros pedidos pendentes dele |
+| PATCH | `/api/solicitacoes/{id}/rejeitar` | Rejeita com um motivo (corpo `{ "motivo": "..." }`) |
+| GET | `/api/adocoes` | Lista as adoções, com filtros opcionais `usuario`, `animal` e `instituicao` (ids) |
+| GET | `/api/adocoes/{id}` | Consulta uma adoção |
+| PUT | `/api/adocoes/{id}` | Atualiza observações e retorno pós-adoção |
+| GET | `/api/usuarios/{id}/favoritos` | Lista os animais favoritos do usuário |
+| POST | `/api/usuarios/{id}/favoritos` | Favorita um animal (corpo `{ "animalId": 3 }`; `409` se já é favorito) |
+| DELETE | `/api/favoritos/{id}` | Remove um favorito |
 
 Exemplo de cadastro (`POST /api/usuarios`):
 
@@ -234,12 +262,57 @@ Exemplo de resposta (`GET /api/racas?especie=1&busca=beagle`):
 ]
 ```
 
+### Instituições e CEP
+
+Exemplo de cadastro (`POST /api/instituicoes`); no `PUT` o corpo é o mesmo:
+
+```json
+{
+  "usuarioId": 2, "nome": "Abrigo Patinhas", "cnpj": null,
+  "telefone": "11 3333-4444", "email": "contato@patinhas.org",
+  "cep": "01001-000", "logradouro": "Praça da Sé", "numero": "100", "complemento": null,
+  "bairro": "Sé", "cidade": "São Paulo", "uf": "SP"
+}
+```
+
+O CEP é gravado só com os 8 dígitos e a UF em maiúsculas. Para preencher o endereço, o frontend chama `GET /api/cep/01001000`, que responde `{ "cep", "logradouro", "complemento", "bairro", "cidade", "uf" }` com os dados do ViaCEP.
+
+### Solicitações e adoção
+
+Exemplo (`POST /api/solicitacoes`):
+
+```json
+{ "usuarioId": 3, "animalId": 1, "mensagem": "Moro perto de um parque.", "tipoMoradia": "Apartamento", "temOutrosAnimais": false }
+```
+
+`tipoMoradia`: `Casa`, `Apartamento` ou `Outra`. O status do animal acompanha o fluxo:
+
+| Acontecimento | Status do animal |
+| --- | --- |
+| Primeira solicitação recebida | `Disponivel` → `EmProcesso` |
+| Solicitação aprovada | `Adotado` (as outras pendentes são rejeitadas automaticamente) |
+| Última pendente cancelada ou rejeitada | volta a `Disponivel` |
+
+A aprovação roda numa única transação: se qualquer passo falhar, nada é gravado. A resposta traz a solicitação e a adoção criada.
+
+## Hospedagem
+
+| Parte | Onde | Atualização |
+| --- | --- | --- |
+| Site (React) | Render, site estático | Automática a cada push na `main` |
+| API (Yesod) | Render, imagem Docker `ghcr.io/gug4negrao/patas-e-lares-api` | Push que mexe em `backend/` → o GitHub Actions compila a imagem ([workflow](.github/workflows/backend.yml)) e avisa o Render pelo Deploy Hook |
+| Banco | Neon (PostgreSQL), mesma região da API (US East) | As tabelas são criadas pela migração ao subir a API |
+
+Variáveis configuradas no Render: no site, `VITE_API_URL`; na API, `DATABASE_URL`, `FRONTEND_ORIGIN`, `DB_POOL` e `THEDOGAPI_KEY`. Os valores secretos ficam só no Render, nunca no repositório.
+
+Como cada push na `main` atualiza o site publicado, teste localmente antes de enviar.
+
 ## Integrantes
 
 | Integrante | Principais contribuições |
 | --- | --- |
-| Gustavo | Base do backend, banco de dados, usuários e login |
+| Gustavo | Base do backend, banco de dados, usuários e login, telas de conta, esqueleto do React e hospedagem |
 | Isabelle | Animais, espécies e registros de saúde |
 | Giovanna | Instituições e integração com ViaCEP |
 | Júlia | Solicitações, adoção e favoritos |
-| Filipi | Esqueleto do React, raças e integração com TheDogAPI |
+| Filipi | Raças, integração com TheDogAPI e identidade visual do site |
