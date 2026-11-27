@@ -20,3 +20,27 @@ export async function api(caminho, { metodo = 'GET', corpo } = {}) {
   }
   return dados
 }
+
+// Fluxo de adoção e favoritos (Júlia Rodrigues). Usam a mesma função api()
+// das outras telas, então herdam a URL base e as mensagens de erro.
+export const solicitacoesApi = {
+  // dados: { usuarioId, animalId, mensagem, tipoMoradia, temOutrosAnimais }
+  criar: (dados) => api('/solicitacoes', { metodo: 'POST', corpo: dados }),
+  listar: (filtros = {}) => api(`/solicitacoes?${new URLSearchParams(filtros)}`),
+  cancelar: (id) => api(`/solicitacoes/${id}`, { metodo: 'DELETE' }),
+  aprovar: (id) => api(`/solicitacoes/${id}/aprovar`, { metodo: 'PATCH' }),
+  rejeitar: (id, motivo) =>
+    api(`/solicitacoes/${id}/rejeitar`, { metodo: 'PATCH', corpo: { motivo } }),
+}
+
+export const adocoesApi = {
+  listar: (filtros = {}) => api(`/adocoes?${new URLSearchParams(filtros)}`),
+  atualizar: (id, dados) => api(`/adocoes/${id}`, { metodo: 'PUT', corpo: dados }),
+}
+
+export const favoritosApi = {
+  listar: (usuarioId) => api(`/usuarios/${usuarioId}/favoritos`),
+  adicionar: (usuarioId, animalId) =>
+    api(`/usuarios/${usuarioId}/favoritos`, { metodo: 'POST', corpo: { animalId } }),
+  remover: (favoritoId) => api(`/favoritos/${favoritoId}`, { metodo: 'DELETE' }),
+}

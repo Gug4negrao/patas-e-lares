@@ -4,6 +4,8 @@ import { api } from '../api.js'
 import { useSessao } from '../sessao.jsx'
 import { PORTES, SEXOS, STATUS, buscarMinhaInstituicao, dataBr, idade } from '../animais.js'
 import HistoricoSaude from '../componentes/HistoricoSaude.jsx'
+import BotaoQueroAdotar from '../componentes/BotaoQueroAdotar.jsx'
+import { BotaoFavoritar } from '../componentes/MeusFavoritos.jsx'
 
 export default function Animal() {
   const { id } = useParams()
@@ -82,6 +84,24 @@ export default function Animal() {
 
       <p className="descricao">{animal.descricao}</p>
 
+      {/* Fluxo de adoção: adotantes pedem a adoção e favoritam; visitantes são convidados a entrar. */}
+      {usuario?.tipo === 'Adotante' && (
+        <div className="adotar">
+          <BotaoQueroAdotar
+            usuario={usuario}
+            animal={animal}
+            onCriada={() => api(`/animais/${id}`).then(setAnimal).catch(() => {})}
+          />
+          <BotaoFavoritar usuario={usuario} animalId={animal.id} />
+        </div>
+      )}
+      {!usuario && (animal.status === 'Disponivel' || animal.status === 'EmProcesso') && (
+        <p className="adotar">
+          <Link to="/login">Entre</Link> ou <Link to="/cadastro">crie uma conta</Link> de adotante
+          para pedir a adoção de {animal.nome}.
+        </p>
+      )}
+
       {animal.raca && (animal.raca.temperamento || animal.raca.expectativaVida || animal.raca.imagemUrl) && (
         <div className="sobre-raca">
           {animal.raca.imagemUrl && <img src={animal.raca.imagemUrl} alt={animal.raca.nome} />}
@@ -102,6 +122,7 @@ export default function Animal() {
               : <button className="secundario" onClick={() => mudarStatus('Disponivel')}>Voltar a anunciar</button>
           )}
           <button className="perigo" onClick={excluir}>Excluir</button>
+          <Link to="/solicitacoes">Solicitações recebidas</Link>
         </div>
       )}
       {erro && <p className="erro">{erro}</p>}

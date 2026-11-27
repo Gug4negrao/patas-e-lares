@@ -40,7 +40,7 @@ O logo é uma casa (lar) com uma pegada (patas) dentro: `<Logo />` em [src/compo
 
 Fontes (Google Fonts, carregadas no `index.html`): **Fredoka** nos títulos e **Nunito** no texto. Todas as combinações de cor de texto passam no contraste mínimo WCAG AA (4,5:1).
 
-Classes prontas para novas telas: `cartao` (formulário centralizado; `cartao largo` para mais espaço), `cabecalho` (título + ações), `filtros`, `grade` + `ficha` (cards com foto), `selo selo-<Status>`, `botao` (link com cara de botão; `botao-secundario` para o contorno), `secundario` e `perigo` (botões), `erro` e `aviso` (mensagens), `detalhe` (texto de apoio). Abaixo de 920px o menu vira o botão "Menu"; abaixo de 640px as grades e fichas ficam em uma coluna.
+Classes prontas para novas telas: `cartao` (formulário centralizado; `cartao largo` para mais espaço), `cabecalho` (título + ações), `filtros`, `grade` + `ficha` (cards com foto), `selo selo-<Status>`, `botao` (link com cara de botão; `botao-secundario` para o contorno), `secundario` e `perigo` (botões), `erro` e `aviso` (mensagens), `detalhe` (texto de apoio). Abaixo de 1120px o menu vira o botão "Menu"; abaixo de 640px as grades e fichas ficam em uma coluna.
 
 Para criar uma tela: adicione o arquivo em `src/paginas/`, registre a rota em `App.jsx` e use `api()` para falar com o backend. Erros da API chegam como exceção com a mensagem do campo `erro`.
 
@@ -64,3 +64,14 @@ As telas do gestor descobrem a instituição dele por `GET /api/instituicoes` (p
 | `/racas/:id` | Ficha da raça, com os temperamentos em etiquetas e os animais dessa raça disponíveis para adoção (`GET /api/animais?raca={id}&status=Disponivel`) |
 
 As telas nunca chamam a TheDogAPI diretamente: tudo passa pelo backend, que guarda as raças no banco e mantém a chave em segredo. A lista é carregada uma vez e filtrada no navegador, então a busca responde na hora.
+
+## Fluxo de adoção e favoritos
+
+| Rota | Tela |
+| --- | --- |
+| `/animais/:id` | Para adotantes: botão "Quero adotar" (formulário com moradia, outros animais e mensagem) e "♥ Favoritar". Visitantes veem o convite para entrar |
+| `/minhas-solicitacoes` | Solicitações do adotante, com situação, resposta da instituição e opção de cancelar as pendentes |
+| `/favoritos` | Animais favoritados pelo adotante, com opção de remover |
+| `/solicitacoes` | Painel do gestor: solicitações recebidas pela instituição, com filtro por situação, aprovação e rejeição com motivo |
+
+Os componentes ficam em `src/componentes/` (`BotaoQueroAdotar`, `MinhasSolicitacoes`, `PainelSolicitacoes`, `MeusFavoritos` com `BotaoFavoritar`, `StatusBadge`) e as páginas que os recebem em [src/paginas/Adocao.jsx](src/paginas/Adocao.jsx). As chamadas ao backend estão em `solicitacoesApi`, `adocoesApi` e `favoritosApi`, no fim de [src/api.js](src/api.js).

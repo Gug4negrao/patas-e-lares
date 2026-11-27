@@ -817,6 +817,107 @@ hr {
   border-radius: 999px;
 }
 
+/* ---------- Fluxo de adoção e favoritos ---------- */
+
+.selo-Pendente { color: #8a5a00; background: #fdf0d5; }
+.selo-Aprovada { color: var(--cor-ok); background: #e3f3e7; }
+.selo-Rejeitada { color: var(--cor-erro); background: #fdecea; }
+.selo-Cancelada { color: var(--cor-suave); background: #ece8e4; }
+
+.lista-cartoes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-cartoes > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1.25rem 1.4rem;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  box-shadow: var(--sombra);
+}
+
+.lista-cartoes > li > button.link {
+  align-self: flex-start;
+}
+
+.lista-cartoes-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.lista-cartoes-topo a {
+  font-family: var(--fonte-titulo);
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.lista-cartoes-topo .selo {
+  margin-top: 0;
+}
+
+.lista-cartoes blockquote {
+  margin: 0.3rem 0;
+  padding: 0.6rem 0.9rem;
+  font-style: italic;
+  background: var(--cor-fundo);
+  border-left: 4px solid var(--cor-mel);
+  border-radius: 0 10px 10px 0;
+}
+
+.campo-motivo {
+  flex: 1 1 220px;
+}
+
+.adotar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.75rem;
+  padding: 1.25rem 1.4rem;
+  background: var(--cor-principal-clara);
+  border-radius: var(--raio-grande);
+}
+
+p.adotar {
+  display: block;
+}
+
+.form-adocao {
+  flex-basis: 100%;
+}
+
+.form-adocao h3 {
+  margin: 0;
+}
+
+.ficha-link {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  color: var(--cor-texto);
+  text-decoration: none;
+}
+
+.ficha-link:hover {
+  color: var(--cor-texto);
+}
+
+.ficha-acoes {
+  padding: 0 1rem 1rem;
+}
+
 /* ---------- Página inicial ---------- */
 
 .inicio > section + section {
@@ -957,9 +1058,10 @@ hr {
   text-align: center;
 }
 
-/* ---------- Telas médias: menu recolhido ---------- */
+/* ---------- Telas médias: menu recolhido ----------
+   O menu do gestor tem 8 itens; abaixo de 1120px ele não cabe numa linha. */
 
-@media (max-width: 920px) {
+@media (max-width: 1120px) {
   .menu-botao {
     display: inline-flex;
   }
@@ -994,7 +1096,11 @@ hr {
     margin: 0.3rem 0 0;
     text-align: center;
   }
+}
 
+/* ---------- Tablets: página inicial em uma coluna ---------- */
+
+@media (max-width: 920px) {
   .destaque {
     grid-template-columns: 1fr;
   }

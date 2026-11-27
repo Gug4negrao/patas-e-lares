@@ -14,6 +14,7 @@ import Especies from './paginas/Especies.jsx'
 import Instituicoes from './paginas/Instituicoes.jsx'
 import Racas from './paginas/Racas.jsx'
 import Raca from './paginas/Raca.jsx'
+import { PaginaFavoritos, PaginaMinhasSolicitacoes, PaginaSolicitacoesRecebidas } from './paginas/Adocao.jsx'
 
 export default function App() {
   const { usuario, sair } = useSessao()
@@ -56,6 +57,9 @@ export default function App() {
               <>
                 {usuario.tipo === 'Gestor' && <NavLink to="/meus-animais">Meus animais</NavLink>}
                 {usuario.tipo === 'Gestor' && <NavLink to="/instituicoes">Minha instituição</NavLink>}
+                {usuario.tipo === 'Gestor' && <NavLink to="/solicitacoes">Solicitações</NavLink>}
+                {usuario.tipo === 'Adotante' && <NavLink to="/minhas-solicitacoes">Minhas solicitações</NavLink>}
+                {usuario.tipo === 'Adotante' && <NavLink to="/favoritos">Favoritos</NavLink>}
                 <NavLink to="/perfil">Meu perfil</NavLink>
                 <button className="link" onClick={encerrarSessao}>Sair</button>
               </>
@@ -84,6 +88,9 @@ export default function App() {
           <Route path="/instituicoes" element={<Instituicoes />} />
           <Route path="/racas" element={<Racas />} />
           <Route path="/racas/:id" element={<Raca />} />
+          <Route path="/minhas-solicitacoes" element={<PaginaMinhasSolicitacoes />} />
+          <Route path="/favoritos" element={<PaginaFavoritos />} />
+          <Route path="/solicitacoes" element={<PaginaSolicitacoesRecebidas />} />
           <Route path="*" element={<NaoEncontrada />} />
         </Routes>
       </main>
