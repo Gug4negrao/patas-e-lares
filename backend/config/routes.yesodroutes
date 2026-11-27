@@ -21,3 +21,6 @@
 /api/racas RacasR GET
 /api/racas/sincronizar RacasSincronizarR POST
 !/api/racas/#RacaId RacaR GET
+
+/api/solicitacoes                                      SolicitacoesR GET POST
+/api/solicitacoes/#SolicitacaoAdocaoId                 SolicitacaoR GET DELETE

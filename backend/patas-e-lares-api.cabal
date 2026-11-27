@@ -28,9 +28,11 @@ library
         Handler.Comum
         Handler.CEP
         Handler.Especie
+        Handler.Filtros
         Handler.Instituicao
         Handler.Raca
         Handler.RegistroSaude
+        Handler.Solicitacao
         Handler.Status
         Handler.Usuario
         Models

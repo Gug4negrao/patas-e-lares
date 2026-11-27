@@ -18,6 +18,7 @@ import Handler.Usuario
 import Handler.Instituicao
 import Handler.CEP
 import Handler.Raca
+import Handler.Solicitacao
 
 mkYesodDispatch "App" resourcesApp
 
