@@ -238,8 +238,8 @@ Exemplo de resposta (`GET /api/racas?especie=1&busca=beagle`):
 
 | Integrante | Principais contribuições |
 | --- | --- |
-| Integrante 1 | Base do backend, banco de dados, usuários e login |
-| Integrante 2 | Animais, espécies e registros de saúde |
-| Integrante 3 | Instituições e integração com ViaCEP |
-| Integrante 4 | Solicitações, adoção e favoritos |
-| Integrante 5 | Esqueleto do React, raças e integração com TheDogAPI |
+| Gustavo | Base do backend, banco de dados, usuários e login |
+| Isabelle | Animais, espécies e registros de saúde |
+| Giovanna | Instituições e integração com ViaCEP |
+| Júlia | Solicitações, adoção e favoritos |
+| Filipi | Esqueleto do React, raças e integração com TheDogAPI |
