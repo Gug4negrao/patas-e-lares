@@ -60,7 +60,9 @@ A API sobe em `http://localhost:8080`. Teste com `curl http://localhost:8080/api
 
 > Se as respostas vierem num formato estranho, outro programa pode estar usando a mesma porta: no Windows o servidor não acusa erro nesse caso. Confira com `netstat -ano | findstr :8080` ou troque a porta com `PORT=8081`.
 
-Variáveis de ambiente opcionais (padrões em [backend/.env.example](backend/.env.example)): `PORT`, `DATABASE_URL`, `DB_POOL`, `FRONTEND_ORIGIN`.
+Variáveis de ambiente opcionais (padrões em [backend/.env.example](backend/.env.example)): `PORT`, `DATABASE_URL`, `DB_POOL`, `FRONTEND_ORIGIN`, `THEDOGAPI_KEY`.
+
+> **TheDogAPI:** sem `THEDOGAPI_KEY` a API funciona normalmente, mas não importa as raças de cães. A chave é gratuita em [thedogapi.com](https://thedogapi.com) e fica só no servidor (nunca no frontend nem no repositório). No Windows, para não precisar defini-la a cada terminal: `[Environment]::SetEnvironmentVariable("THEDOGAPI_KEY", "sua-chave", "User")` no PowerShell e reabra o terminal. No Render, cadastre-a na aba **Environment** do serviço.
 
 ### 3. Frontend
 
@@ -110,7 +112,7 @@ Instituição, espécie, raça e animal com registros dependentes não podem ser
 
 ## Endpoints
 
-Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou `500`.
+Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou `500`; nas integrações externas, também `502` (o serviço externo falhou) ou `503` (integração não configurada no servidor).
 
 | Método | Rota | Finalidade |
 | --- | --- | --- |
@@ -137,6 +139,9 @@ Erros sempre respondem `{"erro": "mensagem"}`, com status `400`, `404`, `409` ou
 | GET | `/api/saude/{id}` | Consulta um registro de saúde |
 | PUT | `/api/saude/{id}` | Atualiza um registro de saúde |
 | DELETE | `/api/saude/{id}` | Remove um registro de saúde |
+| GET | `/api/racas` | Lista as raças em ordem alfabética, com filtros opcionais `?especie=` (id) e `?busca=` (trecho do nome) |
+| GET | `/api/racas/{id}` | Consulta uma raça |
+| POST | `/api/racas/sincronizar` | Importa ou atualiza as raças de cães a partir da TheDogAPI (`503` sem chave, `502` se a TheDogAPI falhar) |
 
 Exemplo de cadastro (`POST /api/usuarios`):
 
@@ -184,6 +189,26 @@ Exemplo (`POST /api/animais/1/saude`):
 ```
 
 `tipo`: `Vacina`, `Vermifugo`, `Consulta` ou `Castracao`. `veterinario` é opcional. Registrar uma `Castracao` já marca o animal como castrado.
+
+### Raças e TheDogAPI
+
+As raças de cães vêm da [TheDogAPI](https://thedogapi.com), mas o frontend nunca fala com ela: o backend importa as raças para a tabela `raca` (ligadas à espécie Cão) e as rotas `/api/racas` leem do banco. Assim a chave fica no servidor e o catálogo continua funcionando se a TheDogAPI sair do ar.
+
+- **Importação automática:** ao subir, se nenhuma raça veio da TheDogAPI ainda (banco novo, como no primeiro deploy), a API importa todas em segundo plano. Sem `THEDOGAPI_KEY`, só avisa no log.
+- **Importação manual:** `POST /api/racas/sincronizar` busca a lista de novo e atualiza temperamento, expectativa de vida e imagem. Raças com o mesmo nome não são duplicadas.
+
+Exemplo de resposta (`GET /api/racas?especie=1&busca=beagle`):
+
+```json
+[
+  {
+    "id": 12, "especieId": 1, "nome": "Beagle", "dogApiId": 31,
+    "temperamento": "Friendly, gentle, alert, outgoing, curious, energetic",
+    "expectativaVida": "10-15 anos",
+    "imagemUrl": "https://cdn2.thedogapi.com/images/....jpg"
+  }
+]
+```
 
 ## Integrantes
 

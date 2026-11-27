@@ -17,3 +17,7 @@
 /api/instituicoes InstituicoesR GET POST
 /api/instituicoes/#InstituicaoId InstituicaoR GET PUT DELETE
 /api/cep/#Text CepR GET
+
+/api/racas RacasR GET
+/api/racas/sincronizar RacasSincronizarR POST
+!/api/racas/#RacaId RacaR GET

@@ -17,6 +17,7 @@ import Handler.Status
 import Handler.Usuario
 import Handler.Instituicao
 import Handler.CEP
+import Handler.Raca
 
 mkYesodDispatch "App" resourcesApp
 

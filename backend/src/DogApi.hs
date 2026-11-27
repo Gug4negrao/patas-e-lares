@@ -8,10 +8,12 @@ module DogApi
     , mensagemErro
     , buscarRacasDogApi
     , salvarRacas
+    , importarRacasSeVazio
     ) where
 
 import Control.Applicative ((<|>))
 import Control.Exception (SomeException, try)
+import Control.Monad (when)
 import Control.Monad.IO.Class (MonadIO)
 import Data.Aeson
 import Data.Aeson.Types (Parser, parseMaybe)
@@ -23,7 +25,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import Database.Persist
-import Database.Persist.Sql (SqlPersistT)
+import Database.Persist.Sql (ConnectionPool, SqlPersistT, runSqlPool)
 import Network.HTTP.Client
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status (statusCode)
@@ -154,3 +156,24 @@ salvarRacas racas = do
         , RacaExpectativaVida =. dogExpectativaVida r
         , RacaImagemUrl       =. dogImagemUrl r
         ]
+
+-- | Chamada ao subir a API: se nenhuma raça veio da TheDogAPI ainda (banco novo,
+-- como no primeiro deploy), importa todas. Falhas só geram aviso no log, sem
+-- impedir a API de subir. (Mensagens de log sem acento: o console do Windows
+-- pode não aceitar.)
+importarRacasSeVazio :: Maybe Text -> ConnectionPool -> IO ()
+importarRacasSeVazio Nothing _ =
+    putStrLn "THEDOGAPI_KEY nao configurada: racas de caes nao serao importadas."
+importarRacasSeVazio chave pool = do
+    resultado <- try $ do
+        importadas <- runSqlPool (count [RacaDogApiId !=. Nothing]) pool
+        when (importadas == 0) $ do
+            putStrLn "Importando racas da TheDogAPI..."
+            resposta <- buscarRacasDogApi chave
+            salvo <- either (return . Left) (\racas -> runSqlPool (salvarRacas racas) pool) resposta
+            putStrLn $ case salvo of
+                Right total -> "Racas importadas da TheDogAPI: " <> show total
+                Left erro   -> "Falha ao importar racas da TheDogAPI: " <> show erro
+    case resultado of
+        Left (e :: SomeException) -> putStrLn ("Falha ao importar racas da TheDogAPI: " <> show e)
+        Right ()                  -> return ()

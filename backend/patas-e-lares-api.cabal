@@ -29,6 +29,7 @@ library
         Handler.CEP
         Handler.Especie
         Handler.Instituicao
+        Handler.Raca
         Handler.RegistroSaude
         Handler.Status
         Handler.Usuario
