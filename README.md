@@ -66,7 +66,31 @@ Variáveis de ambiente opcionais (padrões em [backend/.env.example](backend/.en
 
 ### 3. Frontend
 
-_A ser preenchido pelo Integrante 5._
+Pré-requisitos: Node 18 ou mais recente (com npm). Deixe a API rodando em outro terminal.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Abre em `http://localhost:5173`. O frontend chama a API em `http://localhost:8080/api`; se a API estiver em outro endereço ou porta, crie `frontend/.env` com `VITE_API_URL` (exemplo em [frontend/.env.example](frontend/.env.example)). Se mudar a porta do frontend, ajuste também `FRONTEND_ORIGIN` no backend, senão o navegador bloqueia as chamadas (CORS).
+
+Para gerar a versão de produção: `npm run build` (arquivos em `frontend/dist/`).
+
+Telas principais:
+
+| Rota | Tela |
+| --- | --- |
+| `/` | Início |
+| `/cadastro` e `/login` | Criar conta e entrar |
+| `/perfil` | Dados do usuário logado |
+| `/animais` e `/animais/{id}` | Animais disponíveis para adoção e ficha de cada um |
+| `/meus-animais`, `/animais/novo`, `/especies` | Gestão dos animais e espécies (gestor) |
+| `/instituicoes` | Instituição do gestor |
+| `/racas` e `/racas/{id}` | Catálogo de raças de cães (TheDogAPI), com busca, e ficha da raça com os animais dela para adoção |
+
+Detalhes da organização do código em [frontend/README.md](frontend/README.md). O menu se reorganiza em telas estreitas (celular).
 
 ## Estrutura do backend
 
