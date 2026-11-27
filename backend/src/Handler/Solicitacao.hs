@@ -5,6 +5,8 @@ module Handler.Solicitacao
     , postSolicitacoesR
     , getSolicitacaoR
     , deleteSolicitacaoR
+    , patchAprovarSolicitacaoR
+    , patchRejeitarSolicitacaoR
     ) where
 
 import Control.Monad (unless, when)
@@ -13,7 +15,7 @@ import qualified Data.Map.Strict as Map
 import Data.Maybe (isJust)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Time (getCurrentTime)
+import Data.Time (getCurrentTime, utctDay)
 import Database.Persist
 import GHC.Generics (Generic)
 import Network.HTTP.Types.Status
@@ -21,6 +23,7 @@ import Yesod.Core
 import Yesod.Persist.Core (YesodDB, runDB)
 
 import Foundation
+import Handler.Adocao (adocaoJson)
 import Handler.Animal (animaisJson)
 import Handler.Comum
 import Handler.Filtros
@@ -36,6 +39,12 @@ data NovaSolicitacao = NovaSolicitacao
     } deriving Generic
 
 instance FromJSON NovaSolicitacao
+
+newtype Resposta = Resposta
+    { motivo :: Text
+    } deriving Generic
+
+instance FromJSON Resposta
 
 -- Dentro do runDB os erros precisam subir um nível (lift) para o Handler.
 -- Como a exceção interrompe o bloco, a transação inteira é desfeita.
@@ -147,6 +156,68 @@ deleteSolicitacaoR sid = do
         return s { solicitacaoAdocaoStatus = Cancelada
                  , solicitacaoAdocaoRespondidoEm = Just agora }
     umaSolicitacaoJson (Entity sid cancelada)
+
+-- PATCH /api/solicitacoes/#id/aprovar
+-- Tudo no mesmo runDB: ou acontece tudo, ou nada.
+patchAprovarSolicitacaoR :: SolicitacaoAdocaoId -> Handler Value
+patchAprovarSolicitacaoR sid = do
+    agora <- liftIO getCurrentTime
+    (aprovada, adocaoId', adocao) <- runDB $ do
+        s <- buscarPendente "Só é possível aprovar solicitações pendentes." sid
+        let aid = solicitacaoAdocaoAnimalId s
+        animal <- get aid >>= maybe (falhar status404 "Animal não encontrado.") return
+        when (animalStatus animal `elem` [Adotado, Inativo]) $
+            falhar status409 "Este animal não está mais disponível para adoção."
+
+        -- 1) aprova a solicitação
+        update sid [ SolicitacaoAdocaoStatus =. Aprovada
+                   , SolicitacaoAdocaoRespondidoEm =. Just agora ]
+        -- 2) registra a adoção
+        let novaAdocao = Adocao
+                { adocaoSolicitacaoId    = sid
+                , adocaoAnimalId         = aid
+                , adocaoDataAdocao       = utctDay agora
+                , adocaoTermoAceito      = True
+                , adocaoObservacoes      = Nothing
+                , adocaoRetornoPosAdocao = Nothing
+                }
+        novaId <- insert novaAdocao
+        -- 3) o animal passa a Adotado
+        update aid [AnimalStatus =. Adotado]
+        -- 4) rejeita as outras solicitações pendentes do mesmo animal
+        updateWhere
+            [ SolicitacaoAdocaoAnimalId ==. aid
+            , SolicitacaoAdocaoStatus ==. Pendente ]
+            [ SolicitacaoAdocaoStatus =. Rejeitada
+            , SolicitacaoAdocaoMotivoResposta =. Just "Outra solicitação foi aprovada para este animal."
+            , SolicitacaoAdocaoRespondidoEm =. Just agora ]
+
+        let atualizada = s { solicitacaoAdocaoStatus = Aprovada
+                           , solicitacaoAdocaoRespondidoEm = Just agora }
+        return (atualizada, novaId, novaAdocao)
+    solicitacao <- umaSolicitacaoJson (Entity sid aprovada)
+    return $ object
+        [ "solicitacao" .= solicitacao
+        , "adocao"      .= adocaoJson (Entity adocaoId' adocao)
+        ]
+
+-- PATCH /api/solicitacoes/#id/rejeitar     corpo: { "motivo": "..." }
+patchRejeitarSolicitacaoR :: SolicitacaoAdocaoId -> Handler Value
+patchRejeitarSolicitacaoR sid = do
+    dados <- lerJson :: Handler Resposta
+    let motivoLimpo = T.strip dados.motivo
+    exigir (not (T.null motivoLimpo)) "Informe o motivo da rejeição."
+    agora <- liftIO getCurrentTime
+    rejeitada <- runDB $ do
+        s <- buscarPendente "Só é possível rejeitar solicitações pendentes." sid
+        update sid [ SolicitacaoAdocaoStatus =. Rejeitada
+                   , SolicitacaoAdocaoMotivoResposta =. Just motivoLimpo
+                   , SolicitacaoAdocaoRespondidoEm =. Just agora ]
+        liberarAnimalSeSemPendentes (solicitacaoAdocaoAnimalId s)
+        return s { solicitacaoAdocaoStatus = Rejeitada
+                 , solicitacaoAdocaoMotivoResposta = Just motivoLimpo
+                 , solicitacaoAdocaoRespondidoEm = Just agora }
+    umaSolicitacaoJson (Entity sid rejeitada)
 
 -- JSON
 
